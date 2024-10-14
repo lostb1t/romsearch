@@ -16,9 +16,18 @@ args = ["tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--wa
 [tasks.run]
 run_task = { name = ["build-web", "run-server"], fork = false, parallel = false }
 
-[tasks.build-web]
+[tasks.frontend-build]
+cwd = "frontend"
+workspace = false
 command = "dx"
-args = ["build", "--features", "web"]
+args = ["build", "--features", "web", "--release"]
+
+[tasks.move-dist]
+cwd = "frontend"
+workspace = false
+command = "mv"
+args = ["dist", "../docs"]
+
 
 [tasks.run-sync]
 command = "cargo"

@@ -50,7 +50,7 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
 
     let retry_policy = ExponentialBackoff::builder().build_with_max_retries(3);
     let client = ClientBuilder::new(reqwest::Client::new())
-        // .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        //.with(RetryTransientMiddleware::new_with_policy(retry_policy))
         .with(RetryTransientMiddleware::new_with_policy_and_strategy(
             retry_policy,
             Retry,
@@ -71,7 +71,7 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
     let entry_selector = Selector::parse("#list tbody tr").unwrap();
     let link_selector = Selector::parse(".link a").unwrap();
     let size_selector = Selector::parse(".size").unwrap();
-
+    drop(text);
     let mut futures = vec![];
     for element in fragment.select(&entry_selector) {
         let link_el = element.select(&link_selector).next().unwrap();
@@ -79,7 +79,7 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
         let size = &size_el.text().collect::<Vec<_>>().first().unwrap().clone();
         let href = link_el.value().attr("href").unwrap().trim_matches('/');
 
-        if *size.clone() == *"-" && *href != *"../" {
+        if *size.clone() == *"-" && *href != *".." {
             futures.push(parse_page(
                 format!(
                     "{}/{}",
@@ -88,6 +88,13 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
                 ),
                 search_client.clone(),
             ));
+            //Box::pin(parse_page(
+            //    format!(
+            //        "{}/{}",
+            //        url.clone(),
+            //        href.clone()
+            //    ),
+            //    search_client.clone())).await;
         } else if *size.clone() != *"-" {
             let mut s = DefaultHasher::new();
             // we got a files
@@ -101,26 +108,27 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
             })
         }
     }
-
+    drop(fragment);
+   
     if !files.is_empty() {
         dbg!("Commiting files");
         dbg!(files.len());
         let _ = search_client
             .index("files")
             .add_or_update(&files, Some("id"))
-            .await
-            .unwrap()
-            .wait_for_completion(&search_client, None, None)
-            .await
-            .unwrap(); 
+            .await;
+            // .unwrap()
+            // //.wait_for_completion(&search_client, None, None)
+            // .await
+            // .unwrap(); 
     }
     
-    files = vec![];
+    drop(files);
 
     if !futures.is_empty() {
         dbg!("Awaiting futures");
         dbg!(futures.len());
-        let mut stream = futures::stream::iter(futures).buffer_unordered(10);
+        let mut stream = futures::stream::iter(futures).buffer_unordered(25);
 
         while let Some(response) = stream.next().await {
             // handle response

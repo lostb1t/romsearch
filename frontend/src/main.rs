@@ -3,6 +3,7 @@ use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
 use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
+use std::env;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct File {
@@ -11,46 +12,64 @@ struct File {
     location: String,
 }
 
-fn app() -> Element {
-    let mut count = use_signal(|| 0);
-    let mut results: Signal<Vec<meilisearch_sdk::search::SearchResult<File>>> = use_signal(|| vec![]);
-    let mut search = use_signal(|| "".to_string());
-
-    let SEARCH_API_URL = env::var("SEARCH_API_URL").unwrap();
-    let SEARCH_API_KEY = env::var("SEARCH_API_KEY").unwrap();
+async fn search(input: &str) -> Vec<meilisearch_sdk::search::SearchResult<File>> {
+    let SEARCH_API_URL: &'static str = env!("SEARCH_API_URL");
+    let SEARCH_API_KEY: &'static str = env!("SEARCH_API_KEY");
+    //let SEARCH_API_URL = env::var("SEARCH_API_URL").unwrap();
+    //let SEARCH_API_KEY = env::var("SEARCH_API_KEY").unwrap();
+    let client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
     
+    client
+        .index("files")
+        .search()
+        .with_limit(50)
+        .with_query(input)
+        .execute::<File>()
+        .await
+        .unwrap()
+        .hits
+}
+
+fn app() -> Element {
+    //let mut results: Signal<Vec<meilisearch_sdk::search::SearchResult<File>>> =
+    // use_signal(|| vec![]);
+    let mut input = use_signal(|| "".to_string());
+    
+    let results = use_resource(move || async move { 
+      if &input() == "" {
+        return None;
+      }
+      Some(search(&input()).await)
+    });
+    // info!("YOHO");
+    //let client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
+
     rsx! {
         h1 { "Rom search" }
         // form { onsubmit,
         input {
-            r#type: "text", id: "search", name: "search", oninput: move |evt| async move {
-                search.set(evt.value());
-                let client = Client::new(
-                        SEARCH_API_URL,
-                        Some(SEARCH_API_KEY)
-                ).unwrap();
-                //info!("called");
-                let search_result = client.index("files").search().with_limit(50).with_query(search().as_str()).execute::<File>().await.unwrap();
-                results.set(search_result.hits);
-                //text.set(format!("{:?}", search_result.hits));
+            r#type: "text",
+            id: "search",
+            name: "search",
+            oninput: move |evt| {
+                // let s = client.clone();
+
+                    // let SEARCH_API_URL = env::var("SEARCH_API_URL").unwrap();
+                    // let SEARCH_API_KEY = env::var("SEARCH_API_KEY").unwrap();
+                    info!("CALLED");
+                    input.set(evt.value());
+                    //let client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
+                    // let search_result = client.index("files").search().with_limit(50).with_query(evt.value().as_str()).execute::<File>().await.unwrap();
+                    // results.set(search_result.hits);
+
             }
-            
+
            // move |evt| search.set(evt.value()),
         }
-        button {
-            onclick: move |_| async move {
-                let client = Client::new(
-                        SEARCH_API_URL,
-                        Some(SEARCH_API_KEY)
-                ).unwrap();
-                let search_result = client.index("files").search().with_limit(50).with_query(search().as_str()).execute::<File>().await.unwrap();
-                results.set(search_result.hits);
-                //text.set(format!("{:?}", search_result.hits));
-            },
-            "Search"
-        }
+
+        if let Some(Some(r)) = results.read().as_ref() {
         ul { class: "todo-list",
-            for result in results.iter() {
+            for result in r.iter() {
                 li {
                     a {
                       href: {result.result.location.clone()},
@@ -61,11 +80,13 @@ fn app() -> Element {
             }
         }
     }
+    }
 }
 
 fn main() {
-    #[cfg(feature = "web")]
-    tracing_wasm::set_as_global_default();
+    // #[cfg(feature = "web")]
+    // tracing_wasm::set_as_global_default();
+    dioxus_logger::init(Level::INFO).expect("logger failed to init");
 
     // #[cfg(feature = "server")]
     // tracing_subscriber::fmt::init();
