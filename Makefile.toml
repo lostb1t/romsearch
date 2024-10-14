@@ -1,0 +1,59 @@
+[tasks.frontend-serve]
+cwd = "frontend"
+workspace = false
+command = "dx"
+args = ["serve", "--platform", "web", "--hot-reload"]
+
+[tasks.watch-tailwind]
+command = "npx"
+args = ["tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--watch"]
+#watch = true
+
+# [tasks.run-server]
+# command = "cargo"
+# args = ["run", "--features", "server"]
+
+[tasks.run]
+run_task = { name = ["build-web", "run-server"], fork = false, parallel = false }
+
+[tasks.build-web]
+command = "dx"
+args = ["build", "--features", "web"]
+
+[tasks.run-sync]
+command = "cargo"
+args = ["run", "-p", "backend"]
+workspace = false
+
+[tasks.backend-build-docker]
+cwd = "backend"
+workspace = false
+command = "docker"
+args = ["buildx", "build", "-t", "ghcr.io/lostb1t/romsearch:latest", ".", "--push"]
+
+[tasks.frontend-build-docker]
+cwd = "frontend"
+workspace = false
+command = "docker"
+args = ["buildx", "build", "-t", "ghcr.io/lostb1t/romsearch-frontend:latest", ".", "--push"]
+
+[tasks.backend-build]
+cwd = "backend"
+workspace = false
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.push]
+dependencies = ["build-web"]
+script = [
+	"git commit -am \"wip\"",
+	"git push origin main"
+]
+
+[tasks.install-dev]
+script = [
+	"apt install nodejs npm -y",
+	"npm install -D tailwindcss",
+	"npm install -D tailwindcss",
+  "cargo install dioxus-cli"
+]
