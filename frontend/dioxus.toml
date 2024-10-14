@@ -1,0 +1,48 @@
+[application]
+
+# App (Project) Name
+name = "Rom search"
+
+# Dioxus App Default Platform
+# web, desktop, fullstack
+default_platform = "web"
+
+# `build` & `serve` dist path
+out_dir = "../docs"
+
+# assets file folder
+asset_dir = "assets"
+base_path = "romsearch"
+
+[web.app]
+
+# HTML title tag content
+title = "Rom Search"
+base_path = "romsearch"
+[web.watcher]
+
+# when watcher trigger, regenerate the `index.html`
+reload_html = true
+
+# which files or dirs will be watcher monitoring
+watch_path = ["src", "assets"]
+
+# include `assets` in web platform
+[web.resource]
+
+# CSS style file
+
+style = []
+
+# Javascript code file
+script = []
+
+[web.resource.dev]
+
+# Javascript code file
+# serve: [dev-server] only
+script = []
+
+[bundle]
+# The list of files to include in the bundle. These can contain globs.
+resources = ["./assets/main.css", "./assets/header.svg", "**/*.png"]
