@@ -41,14 +41,14 @@ fn app() -> Element {
     });
 
     rsx! {
-            head::Link {
-                rel: "stylesheet",
-                href: "https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css"
-            }
-            head::Link {
-                rel: "stylesheet",
-                href: asset!("./assets/site.css")
-            }
+            // head::Link {
+            //     rel: "stylesheet",
+            //     href: "https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css"
+            // }
+            // head::Link {
+            //     rel: "stylesheet",
+            //     href: asset!("./assets/site.css")
+            // }
             // head::Style {
             //  r#"
             //      table td, table th {{
