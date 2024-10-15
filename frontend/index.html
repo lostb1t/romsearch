@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Rom Search</title>
+    <title>{app_title}</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <meta charset="UTF-8" />
     <meta name="mobile-web-app-capable" content="yes">
@@ -10,20 +10,20 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport"
     content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-    
+    {style_include}
 </head>
 <body class="terminal"">
   <div id="main">
     </div>
     <script type="module">
-        import init from "/romsearch/assets/dioxus/Rom search.js";
-        init("/romsearch/assets/dioxus/Rom search_bg.wasm").then(wasm => {
+        import init from "/{base_path}/assets/dioxus/{app_name}.js";
+        init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(wasm => {
             if (wasm.__wbindgen_start == undefined) {
                 wasm.main();
             }
         });
     </script>
-    
+    {script_include}
 </body>
 
 </html>

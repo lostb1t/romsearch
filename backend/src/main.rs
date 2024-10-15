@@ -20,6 +20,8 @@ struct File {
     id: u64,
     name: String,
     location: String,
+    size: String,
+    date: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -71,12 +73,15 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
     let entry_selector = Selector::parse("#list tbody tr").unwrap();
     let link_selector = Selector::parse(".link a").unwrap();
     let size_selector = Selector::parse(".size").unwrap();
+    let date_selector = Selector::parse(".date").unwrap();
     drop(text);
     let mut futures = vec![];
     for element in fragment.select(&entry_selector) {
         let link_el = element.select(&link_selector).next().unwrap();
         let size_el = element.select(&size_selector).next().unwrap();
+        let date_el = element.select(&date_selector).next().unwrap();
         let size = &size_el.text().collect::<Vec<_>>().first().unwrap().clone();
+        let date = &date_el.text().collect::<Vec<_>>().first().unwrap().clone();
         let href = link_el.value().attr("href").unwrap().trim_matches('/');
 
         if *size.clone() == *"-" && *href != *".." {
@@ -105,6 +110,8 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
                 id: s.finish(),
                 name: decode(href.clone()).unwrap().to_string(),
                 location,
+                size: size.to_string(),
+                date: date.to_string()
             })
         }
     }

@@ -11,14 +11,14 @@ default_platform = "web"
 out_dir = "../docs"
 
 # assets file folder
-asset_dir = "assets"
-base_path = "romsearch"
+# asset_dir = "assets"
 
 [web.app]
 
 # HTML title tag content
 title = "Rom Search"
 base_path = "romsearch"
+
 [web.watcher]
 
 # when watcher trigger, regenerate the `index.html`
@@ -45,4 +45,4 @@ script = []
 
 [bundle]
 # The list of files to include in the bundle. These can contain globs.
-resources = ["./assets/main.css", "./assets/header.svg", "**/*.png"]
+resources = ["./assets/*.css"]
