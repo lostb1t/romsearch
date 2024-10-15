@@ -64,7 +64,7 @@ fn app() -> Element {
                 r#type: "text",
                 id: "search",
                 name: "search",
-                placeholder: "Search something...",
+                placeholder: "Search a game...",
                 oninput: move |evt| {
                         input.set(evt.value());
                 }
