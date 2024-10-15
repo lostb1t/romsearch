@@ -121,9 +121,9 @@ fn app() -> Element {
                                     td {
                                     {result.result.size.clone().unwrap_or("-".to_string()).replace(" ", "")}
                                     }
-                                    td {
-                                    {result.result.date.clone().unwrap_or("-".to_string())}
-                                    }
+                                    //td {
+                                    //{result.result.date.clone().unwrap_or("-".to_string())}
+                                    //}
                                 }
                             }
 
