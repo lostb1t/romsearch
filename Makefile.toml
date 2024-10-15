@@ -35,13 +35,13 @@ args = ["run", "-p", "backend"]
 workspace = false
 
 [tasks.backend-build-docker]
-cwd = "backend"
+#cwd = "backend"
 workspace = false
 command = "docker"
-args = ["buildx", "build", "-t", "ghcr.io/lostb1t/romsearch:latest", ".", "--push"]
+args = ["buildx", "build", "-t", "ghcr.io/lostb1t/romsearch:latest", "-f", "backend/Dockerfile", ".", "--push"]
 
 [tasks.frontend-build-docker]
-cwd = "frontend"
+#cwd = "frontend"
 workspace = false
 command = "docker"
 args = ["buildx", "build", "-t", "ghcr.io/lostb1t/romsearch-frontend:latest", ".", "--push"]

@@ -1,4 +1,3 @@
-use std::env;
 use futures::{StreamExt, TryStreamExt};
 use meilisearch_sdk::client::*;
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
@@ -6,8 +5,10 @@ use reqwest_retry::{default_on_request_failure, Retryable, RetryableStrategy};
 use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use urlencoding::decode;
+use shared::{PlatformKind, File};
 
 #[tokio::main]
 async fn main() {
@@ -15,14 +16,6 @@ async fn main() {
     let _ = sync().await;
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct File {
-    id: u64,
-    name: String,
-    location: String,
-    size: String,
-    date: String
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Retry;
@@ -46,8 +39,8 @@ impl RetryableStrategy for Retry {
 }
 
 async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Error> {
-    dbg!("Processing: ");
-    dbg!(&url);
+    // dbg!("Processing: ");
+    // dbg!(&url);
     let mut files: Vec<File> = vec![];
 
     let retry_policy = ExponentialBackoff::builder().build_with_max_retries(3);
@@ -86,11 +79,7 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
 
         if *size.clone() == *"-" && *href != *".." {
             futures.push(parse_page(
-                format!(
-                    "{}/{}",
-                    url.clone(),
-                    href.clone()
-                ),
+                format!("{}/{}", url.clone(), href.clone()),
                 search_client.clone(),
             ));
             //Box::pin(parse_page(
@@ -105,36 +94,43 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
             // we got a files
             let name = href.clone();
             let location = format!("{}/{}", url.clone(), name);
+            let platform = PlatformKind::from_name(decode(&location).unwrap().to_string());
+            //if platform.is_some() {
+            //    dbg!(&platform);
+            //    dbg!(&decode(&location).unwrap().to_string());
+            //}
             location.hash(&mut s);
             files.push(File {
                 id: s.finish(),
                 name: decode(href.clone()).unwrap().to_string(),
                 location,
-                size: size.to_string(),
-                date: date.to_string()
+                size: Some(size.to_string()),
+                date: Some(date.to_string()),
+                tags: vec![],
+                platform: platform
             })
         }
     }
     drop(fragment);
-   
+
     if !files.is_empty() {
-        dbg!("Commiting files");
-        dbg!(files.len());
+        //dbg!("Commiting files");
+        //dbg!(files.len());
         let _ = search_client
             .index("files")
             .add_or_update(&files, Some("id"))
             .await;
-            // .unwrap()
-            // //.wait_for_completion(&search_client, None, None)
-            // .await
-            // .unwrap(); 
+        // .unwrap()
+        // //.wait_for_completion(&search_client, None, None)
+        // .await
+        // .unwrap();
     }
-    
+
     drop(files);
 
     if !futures.is_empty() {
-        dbg!("Awaiting futures");
-        dbg!(futures.len());
+        //dbg!("Awaiting futures");
+        //dbg!(futures.len());
         let mut stream = futures::stream::iter(futures).buffer_unordered(25);
 
         while let Some(response) = stream.next().await {
@@ -151,12 +147,14 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
 async fn sync() -> Result<(), anyhow::Error> {
     let SEARCH_API_URL = env::var("SEARCH_API_URL").unwrap();
     let SEARCH_API_KEY = env::var("SEARCH_API_KEY").unwrap();
-    let search_client = Client::new(
-        SEARCH_API_URL,
-        Some(SEARCH_API_KEY),
-    )
-    .unwrap();
-
+    let search_client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
+    let searchable_attributes = [
+      "name",
+      "location",
+      "tags",
+      "platform"
+    ];
+    search_client.index("files").set_searchable_attributes(&searchable_attributes).await;
     parse_page("https://myrient.erista.me/files".to_string(), search_client)
         .await
         .unwrap();
@@ -188,3 +186,43 @@ async fn sync() -> Result<(), anyhow::Error> {
     // }
     Ok(())
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+
+//     #[test]
+//     fn parse_test() {
+//         let entries: Vec<ParseResult> = vec![ParseResult {
+//             file_name: "Tenet 2020 2160p UHD Webdl DTS-HD MA 5.1 x265-LEGi0N".to_string(),
+//             year: Some(2020),
+//             video_codec: Some(VideoCodecKind::H265),
+//             video_resolution: Some(VideoResolutionKind::R2160P),
+//             source: Some(VideoSourceKind::Webdl),
+//             audio_codec: Some(AudioCodecKind::DTSHD),
+//             ..ParseResult::default()
+//         },
+//         ParseResult {
+//             file_name: "Tenet.2020.2160p.UHD.Webdl.dd5.1.x265-LEGi0N".to_string(),
+//             year: Some(2020),
+//             video_codec: Some(VideoCodecKind::H265),
+//             video_resolution: Some(VideoResolutionKind::R2160P),
+//             source: Some(VideoSourceKind::Webdl),
+//             audio_codec: Some(AudioCodecKind::DD51),
+//             ..ParseResult::default()
+//         },
+//         ParseResult {
+//             file_name: "Sons.of.Anarchy.S03.720p.BluRay.CLUEREWARD".to_string(),
+//             video_resolution: Some(VideoResolutionKind::R720P),
+//             source: Some(VideoSourceKind::BluRay),
+//             ..ParseResult::default()
+//         }];
+//         for entry in entries {
+//             let result = parse(&entry.file_name);
+//             assert_eq!(
+//                 result,
+//                 entry
+//             );
+//         }
+//     }
+// }

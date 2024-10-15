@@ -2,6 +2,7 @@ FROM rust:latest as builder
 WORKDIR /usr/src/app
 COPY . .
 # RUN cargo install cargo-make
+WORKDIR /usr/src/app/backend
 RUN cargo build --release
 
 FROM debian:bookworm-slim

@@ -4,15 +4,7 @@ use dioxus_logger::tracing::{info, Level};
 use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
 use std::env;
-
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-struct File {
-    id: u64,
-    name: String,
-    location: String,
-    size: Option<String>,
-    date: Option<String>,
-}
+use shared::File;
 
 fn create_client() -> Client {
     let SEARCH_API_URL: &'static str = env!("SEARCH_API_URL");
@@ -89,7 +81,7 @@ fn app() -> Element {
                         tfoot {
                             tr {
                                 th {
-                                    colspan: 2,
+                                    colspan: 3,
                                     // p {
                                         // style: "font-size: 0.6em",
                                         "Powered by "
@@ -100,13 +92,13 @@ fn app() -> Element {
                         }
                         tr {
                             th { "name" }
+                            th { "platform" }
                             th { "size" }
-                            //th { "date" }
                         }
                         if let Some(Some(r)) = results.read().as_ref() {
                         if r.is_empty() {
                             tr {
-                              td {  colspan: 2, "No results"}
+                              td {  colspan: 3, "No results"}
                             }
                         } else {
                             for result in r.iter() {
@@ -118,12 +110,19 @@ fn app() -> Element {
                                     {result.result.name.clone()}
                                     }
                                     }
+                          
+                                    td {
+                                    
+                                      if result.result.platform.is_some() {
+                                       {result.result.platform.clone().unwrap().to_string()}
+                                      } else {
+                                        "-"
+                                      }
+                                    }
                                     td {
                                     {result.result.size.clone().unwrap_or("-".to_string()).replace(" ", "")}
                                     }
-                                    //td {
-                                    //{result.result.date.clone().unwrap_or("-".to_string())}
-                                    //}
+                                    
                                 }
                             }
 

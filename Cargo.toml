@@ -2,5 +2,12 @@
 resolver = "2"
 members = [
     "backend",
-    "frontend",
+    "frontend", 
+    "shared",
 ]
+
+[workspace.package]
+version = "0.1.0"
+
+[workspace.dependencies]
+shared = { path = "shared", version = "0.1.0" }
