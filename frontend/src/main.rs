@@ -5,20 +5,25 @@ use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 struct File {
     id: u64,
     name: String,
     location: String,
-    size: String,
-    date: String,
+    size: Option<String>,
+    date: Option<String>,
 }
 
-async fn search(input: &str) -> Vec<meilisearch_sdk::search::SearchResult<File>> {
+fn create_client() -> Client {
     let SEARCH_API_URL: &'static str = env!("SEARCH_API_URL");
     let SEARCH_API_KEY: &'static str = env!("SEARCH_API_KEY");
-    let client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
+    Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap()
+}
 
+async fn execute_search(
+    input: &str,
+    client: &Client,
+) -> Vec<meilisearch_sdk::search::SearchResult<File>> {
     client
         .index("files")
         .search()
@@ -32,12 +37,16 @@ async fn search(input: &str) -> Vec<meilisearch_sdk::search::SearchResult<File>>
 
 fn app() -> Element {
     let mut input = use_signal(|| "".to_string());
+    let client = create_client();
 
-    let results = use_resource(move || async move {
-        if &input() == "" {
-            return None;
+    let results = use_resource(move || {
+        to_owned![client];
+        async move {
+            if &input() == "" {
+                return None;
+            }
+            Some(execute_search(&input(), &client).await)
         }
-        Some(search(&input()).await)
     });
 
     rsx! {
@@ -110,11 +119,11 @@ fn app() -> Element {
                                     }
                                     }
                                     td {
-                                    {result.result.size.clone().replace(" ", "")}
+                                    {result.result.size.clone().unwrap_or("-".to_string()).replace(" ", "")}
                                     }
-                                    //td {
-                                    //{result.result.date.clone()}
-                                    //}
+                                    td {
+                                    {result.result.date.clone().unwrap_or("-".to_string())}
+                                    }
                                 }
                             }
 
