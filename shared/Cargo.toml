@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 serde = "1.0.210"
 strum_macros = "0.26.4"
-logos = "0.14.2"
+regex = "1.11.0"

@@ -61,12 +61,26 @@ fn app() -> Element {
             div {
                 class: "container",
 
-            h1 { "Game rom search" }
+            div { 
+                // style: "display: grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));", 
+                style: "display: flex;flex-wrap: wrap;padding-bottom:20px;padding-top:20px;",
+                div { 
+                    style: "", 
+                    h1 { style: "padding:0;padding-right: 5px", "Game rom search /" } 
+                } 
+                div { 
+                    // h1 { 
+                        style: "font-weight: 300;font-size: 0.8em;", 
+                        "Console filters are available, e.g. 'NES'."
+                        // "add a console abbr to search by console, ex: street fighter nes"
+                    // } 
+                }
+            }
             input {
                 r#type: "text",
                 id: "search",
                 name: "search",
-                placeholder: "Search a game... ex: 'street fighter nes'",
+                placeholder: "Search a something...",
                 oninput: move |evt| {
                   input.set(evt.value());
                 }

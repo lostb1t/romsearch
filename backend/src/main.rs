@@ -5,10 +5,11 @@ use reqwest_retry::{default_on_request_failure, Retryable, RetryableStrategy};
 use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
-use shared::{File, PlatformKind};
+use shared::File;
 use std::env;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use urlencoding::decode;
+use std::process;
 
 #[tokio::main]
 async fn main() {
@@ -81,37 +82,27 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
                 format!("{}/{}", url.clone(), href.clone()),
                 search_client.clone(),
             ));
-            //Box::pin(parse_page(
-            //    format!(
-            //        "{}/{}",
-            //        url.clone(),
-            //        href.clone()
-            //    ),
-            //    search_client.clone())).await;
+
         } else if *size.clone() != *"-" {
             let mut s = DefaultHasher::new();
-            let name = href.clone();
+            let name = href;
             let location = format!("{}/{}", url.clone(), name);
-            let platform_kind = PlatformKind::from_name(decode(&location).unwrap().to_string());
+            let decoded_location = decode(&location).unwrap().to_string();
+            let platform = shared::Platform::parse(&decoded_location);
+            // dbg!(&platform);
+            // if !platform.is_some() {
+            //     dbg!(&decoded_location);
+            //     process::exit(0);
 
-            let platform = match &platform_kind {
-                Some(p) => shared::Platform::for_kind(p),
-                None => None,
-            };
-
+            // }
             location.hash(&mut s);
             files.push(File {
                 id: s.finish(),
-                name: decode(href.clone()).unwrap().to_string(),
+                name: decode(href).unwrap().to_string(),
                 location,
                 size: Some(size.to_string()),
                 date: Some(date.to_string()),
-                // tags: vec![],
-                platform: platform,
-                // weight: match platform {
-                //     Some(platform) => platform.weight,
-                //     None => 0
-                // }
+                platform: platform.cloned(),
             })
         }
     }
@@ -152,8 +143,9 @@ async fn sync() -> Result<(), anyhow::Error> {
     let SEARCH_API_URL = env::var("SEARCH_API_URL").unwrap();
     let SEARCH_API_KEY = env::var("SEARCH_API_KEY").unwrap();
     let search_client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
-    let searchable_attributes = ["name", "platform", "tags", "location"];
+    let searchable_attributes = ["platform.kind", "platform.tags", "name", "location"];
     let sortable_attributes = ["platform.weight"];
+    let displayed_attributes = ["id", "platform.kind", "platform.weight", "name", "location", "size", "date"];
     //let platforms = Platform::platforms();
     let _ = search_client
         .index("files")
@@ -163,7 +155,10 @@ async fn sync() -> Result<(), anyhow::Error> {
         .index("files")
         .set_sortable_attributes(&sortable_attributes)
         .await;
-
+    let _ = search_client
+        .index("files")
+        .set_displayed_attributes(&displayed_attributes)
+        .await;
     parse_page("https://myrient.erista.me/files".to_string(), search_client)
         .await
         .unwrap();
@@ -195,43 +190,3 @@ async fn sync() -> Result<(), anyhow::Error> {
     // }
     Ok(())
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn parse_test() {
-//         let entries: Vec<ParseResult> = vec![ParseResult {
-//             file_name: "Tenet 2020 2160p UHD Webdl DTS-HD MA 5.1 x265-LEGi0N".to_string(),
-//             year: Some(2020),
-//             video_codec: Some(VideoCodecKind::H265),
-//             video_resolution: Some(VideoResolutionKind::R2160P),
-//             source: Some(VideoSourceKind::Webdl),
-//             audio_codec: Some(AudioCodecKind::DTSHD),
-//             ..ParseResult::default()
-//         },
-//         ParseResult {
-//             file_name: "Tenet.2020.2160p.UHD.Webdl.dd5.1.x265-LEGi0N".to_string(),
-//             year: Some(2020),
-//             video_codec: Some(VideoCodecKind::H265),
-//             video_resolution: Some(VideoResolutionKind::R2160P),
-//             source: Some(VideoSourceKind::Webdl),
-//             audio_codec: Some(AudioCodecKind::DD51),
-//             ..ParseResult::default()
-//         },
-//         ParseResult {
-//             file_name: "Sons.of.Anarchy.S03.720p.BluRay.CLUEREWARD".to_string(),
-//             video_resolution: Some(VideoResolutionKind::R720P),
-//             source: Some(VideoSourceKind::BluRay),
-//             ..ParseResult::default()
-//         }];
-//         for entry in entries {
-//             let result = parse(&entry.file_name);
-//             assert_eq!(
-//                 result,
-//                 entry
-//             );
-//         }
-//     }
-// }
