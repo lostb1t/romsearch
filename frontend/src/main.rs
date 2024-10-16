@@ -3,8 +3,8 @@ use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
 use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
-use std::env;
 use shared::File;
+use std::env;
 
 fn create_client() -> Client {
     let SEARCH_API_URL: &'static str = env!("SEARCH_API_URL");
@@ -15,16 +15,17 @@ fn create_client() -> Client {
 async fn execute_search(
     input: &str,
     client: &Client,
-) -> Vec<meilisearch_sdk::search::SearchResult<File>> {
+) -> meilisearch_sdk::search::SearchResults<File> {
     client
         .index("files")
         .search()
-        .with_limit(50)
+        .with_sort(&["platform.weight:desc"])
+        .with_limit(40)
         .with_query(input)
         .execute::<File>()
         .await
         .unwrap()
-        .hits
+    //.hits
 }
 
 fn app() -> Element {
@@ -65,9 +66,9 @@ fn app() -> Element {
                 r#type: "text",
                 id: "search",
                 name: "search",
-                placeholder: "Search a game...",
+                placeholder: "Search a game... ex: 'street fighter nes'",
                 oninput: move |evt| {
-                        input.set(evt.value());
+                  input.set(evt.value());
                 }
             }
 
@@ -96,12 +97,12 @@ fn app() -> Element {
                             th { "size" }
                         }
                         if let Some(Some(r)) = results.read().as_ref() {
-                        if r.is_empty() {
+                        if r.hits.is_empty() {
                             tr {
                               td {  colspan: 3, "No results"}
                             }
                         } else {
-                            for result in r.iter() {
+                            for result in r.hits.iter() {
                                 tr {
                                     td {
                                     a {
@@ -110,11 +111,11 @@ fn app() -> Element {
                                     {result.result.name.clone()}
                                     }
                                     }
-                          
+
                                     td {
-                                    
+
                                       if result.result.platform.is_some() {
-                                       {result.result.platform.clone().unwrap().to_string()}
+                                       {result.result.platform.clone().unwrap().kind.to_string()}
                                       } else {
                                         "-"
                                       }
@@ -122,7 +123,7 @@ fn app() -> Element {
                                     td {
                                     {result.result.size.clone().unwrap_or("-".to_string()).replace(" ", "")}
                                     }
-                                    
+
                                 }
                             }
 

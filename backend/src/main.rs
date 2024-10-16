@@ -5,17 +5,16 @@ use reqwest_retry::{default_on_request_failure, Retryable, RetryableStrategy};
 use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
+use shared::{File, PlatformKind};
 use std::env;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use urlencoding::decode;
-use shared::{PlatformKind, File};
 
 #[tokio::main]
 async fn main() {
     dbg!("Started up");
     let _ = sync().await;
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Retry;
@@ -91,14 +90,15 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
             //    search_client.clone())).await;
         } else if *size.clone() != *"-" {
             let mut s = DefaultHasher::new();
-            // we got a files
             let name = href.clone();
             let location = format!("{}/{}", url.clone(), name);
-            let platform = PlatformKind::from_name(decode(&location).unwrap().to_string());
-            //if platform.is_some() {
-            //    dbg!(&platform);
-            //    dbg!(&decode(&location).unwrap().to_string());
-            //}
+            let platform_kind = PlatformKind::from_name(decode(&location).unwrap().to_string());
+
+            let platform = match &platform_kind {
+                Some(p) => shared::Platform::for_kind(p),
+                None => None,
+            };
+
             location.hash(&mut s);
             files.push(File {
                 id: s.finish(),
@@ -106,8 +106,12 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
                 location,
                 size: Some(size.to_string()),
                 date: Some(date.to_string()),
-                tags: vec![],
-                platform: platform
+                // tags: vec![],
+                platform: platform,
+                // weight: match platform {
+                //     Some(platform) => platform.weight,
+                //     None => 0
+                // }
             })
         }
     }
@@ -148,13 +152,18 @@ async fn sync() -> Result<(), anyhow::Error> {
     let SEARCH_API_URL = env::var("SEARCH_API_URL").unwrap();
     let SEARCH_API_KEY = env::var("SEARCH_API_KEY").unwrap();
     let search_client = Client::new(SEARCH_API_URL, Some(SEARCH_API_KEY)).unwrap();
-    let searchable_attributes = [
-      "name",
-      "location",
-      "tags",
-      "platform"
-    ];
-    search_client.index("files").set_searchable_attributes(&searchable_attributes).await;
+    let searchable_attributes = ["name", "platform", "tags", "location"];
+    let sortable_attributes = ["platform.weight"];
+    //let platforms = Platform::platforms();
+    let _ = search_client
+        .index("files")
+        .set_searchable_attributes(&searchable_attributes)
+        .await;
+    let _ = search_client
+        .index("files")
+        .set_sortable_attributes(&sortable_attributes)
+        .await;
+
     parse_page("https://myrient.erista.me/files".to_string(), search_client)
         .await
         .unwrap();

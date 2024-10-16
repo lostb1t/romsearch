@@ -1,16 +1,52 @@
 use logos::Logos;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use strum_macros::Display;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct File {
-   pub id: u64,
-   pub name: String,
-   pub location: String,
-   pub size: Option<String>,
-   pub date: Option<String>,
-   pub platform: Option<PlatformKind>,
-   pub tags: Vec<String>,
+    pub id: u64,
+    pub name: String,
+    pub location: String,
+    pub size: Option<String>,
+    pub date: Option<String>,
+    pub platform: Option<Platform>,
+    // pub tags: Vec<String>,
+    // pub weight: usize,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
+pub struct Platform {
+    pub weight: usize,
+    pub kind: PlatformKind,
+    pub tags: Vec<String>,
+}
+
+impl Platform {
+    // fn platforms() -> HashMap<PlatformKind, Platform> {
+    //   HashMap::from([
+    //     (PlatformKind::AMIGA, Platform {
+    //       weight: 0,
+    //       kind: PlatformKind::AMIGA
+    //     }),
+    //     (PlatformKind::GB, Platform {
+    //       weight: 20,
+    //       kind: PlatformKind::GB
+    //     })
+    //   ]
+    // }
+
+    pub fn for_kind(kind: &PlatformKind) -> Option<Platform> {
+        match kind {
+            PlatformKind::GB => Some(Platform {
+                weight: 100,
+                tags: vec!["game boy".to_string(), "gameboy".to_string()],
+                kind: PlatformKind::GB,
+            }),
+            _ => None,
+        }
+        // platforms.into_iter().find(|x|x.kind == kind)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Display, Clone)]
@@ -69,19 +105,18 @@ impl PlatformKind {
 #[derive(Logos, Debug, PartialEq, Clone, Display)]
 #[logos(subpattern year = r"(1[89]|20)\d\d")]
 enum Token {
-
     // Platform
-    #[regex(r" atari 2600 ", |_| PlatformKind::A26)]
-    #[regex(r" atari 5200 ", |_| PlatformKind::A52)]
-    #[regex(r" atari 7800 ", |_| PlatformKind::A78)]
-    #[regex(r" amiga ", |_| PlatformKind::AMIGA)]
-    #[regex(r" gba | game boy advance ", |_| PlatformKind::GBA)]
-    #[regex(r" gbc | gameboy color | game boy color ", |_| PlatformKind::GBC)]
-    #[regex(r" gb | gameboy | game boy ", |_| PlatformKind::GB)]
-    #[regex(r" nintendo entertainment system ", |_| PlatformKind::NES)]
-    #[regex(r" super nintendo entertainment system ", |_| PlatformKind::SNES)]
-    #[regex(r" dos | ibm - pc and compatibles ", |_| PlatformKind::DOS)]
-    #[regex(r" nintendo - Wii ", |_| PlatformKind::WII)]
-    #[regex(r" nintendo 64 ", |_| PlatformKind::N64)]
+    #[regex(r"atari 2600", |_| PlatformKind::A26)]
+    #[regex(r"atari 5200", |_| PlatformKind::A52)]
+    #[regex(r"atari 7800", |_| PlatformKind::A78)]
+    #[regex(r"amiga", |_| PlatformKind::AMIGA)]
+    #[regex(r" gba |game boy advance", |_| PlatformKind::GBA)]
+    #[regex(r" gbc |gameboy color|game boy color", |_| PlatformKind::GBC)]
+    #[regex(r"nintendo - game boy", |_| PlatformKind::GB)]
+    #[regex(r"nintendo entertainment system", |_| PlatformKind::NES)]
+    #[regex(r"super nintendo entertainment system", |_| PlatformKind::SNES)]
+    #[regex(r" dos |ibm - pc and compatibles", |_| PlatformKind::DOS)]
+    #[regex(r"nintendo - wii", |_| PlatformKind::WII)]
+    #[regex(r"nintendo 64", |_| PlatformKind::N64)]
     Platform(PlatformKind),
 }
