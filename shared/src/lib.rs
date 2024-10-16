@@ -40,8 +40,51 @@ impl Platform {
         match kind {
             PlatformKind::GB => Some(Platform {
                 weight: 100,
-                tags: vec!["game boy".to_string(), "gameboy".to_string()],
+                tags: vec![
+                    "game boy".to_string(),
+                    "gameboy".to_string(),
+                    "nintendo".to_string(),
+                ],
                 kind: PlatformKind::GB,
+            }),
+            PlatformKind::GBA => Some(Platform {
+                weight: 99,
+                tags: vec![
+                    "game boy advanced".to_string(),
+                    "gameboy advanced".to_string(),
+                    "nintendo".to_string(),
+                ],
+                kind: PlatformKind::GBA,
+            }),
+            PlatformKind::GBC => Some(Platform {
+                weight: 98,
+                tags: vec![
+                    "game boy color".to_string(),
+                    "gameboy color".to_string(),
+                    "nintendo".to_string(),
+                ],
+                kind: PlatformKind::GBC,
+            }),
+            PlatformKind::NES => Some(Platform {
+                weight: 97,
+                tags: vec![
+                    "nintendo entertainment system".to_string(),
+                    "nintendo".to_string(),
+                ],
+                kind: PlatformKind::NES,
+            }),
+            PlatformKind::SNES => Some(Platform {
+                weight: 96,
+                tags: vec![
+                    "super nintendo entertainment system".to_string(),
+                    "nintendo".to_string(),
+                ],
+                kind: PlatformKind::SNES,
+            }),
+            PlatformKind::WII => Some(Platform {
+                weight: 95,
+                tags: vec!["nintendo".to_string(), "superduperteststring".to_string()"],
+                kind: PlatformKind::WII,
             }),
             _ => None,
         }
