@@ -126,12 +126,12 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                 },
             ),
             (
-                PlatformKind::DOS,
+                PlatformKind::PC,
                 Platform {
                     weight: 90,
                     tags: vec!["msdos".to_string(), "pc".to_string()].into(),
-                    kind: PlatformKind::DOS,
-                    regex: Some(r" dos |ibm - pc compatible|ibm - pc and compatibles".to_string()),
+                    kind: PlatformKind::PC,
+                    regex: Some(r"(?:^|[._-])dos(?:$|[._-])| dos |ibm - pc compatible|ibm - pc and compatibles".to_string()),
                 },
             ),
             (
@@ -185,7 +185,7 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                     weight: 0,
                     tags: vec!["sony".to_string()].into(),
                     kind: PlatformKind::PS1,
-                    regex: Some(r"\bplaystation\b(?!\s*\d)".to_string()),
+                    regex: Some(r"\bplaystation\b(?:\s+\d+)?$".to_string()),
                 },
             ),
             (
@@ -286,5 +286,5 @@ pub enum PlatformKind {
     #[strum(to_string = "3DS")]
     N3DS,
     GC,
-    DOS,
+    PC,
 }

@@ -90,11 +90,11 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
             let decoded_location = decode(&location).unwrap().to_string();
             let platform = shared::Platform::parse(&decoded_location);
             // dbg!(&platform);
-            // if !platform.is_some() {
-            //     dbg!(&decoded_location);
+            //if platform.is_some() {
+            //    dbg!(&platform.unwrap().kind);
             //     process::exit(0);
 
-            // }
+            //}
             location.hash(&mut s);
             files.push(File {
                 id: s.finish(),
