@@ -1,4 +1,4 @@
-use regex::Regex;
+use fancy_regex::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::OnceLock;
@@ -215,6 +215,24 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                     regex: Some(r"playstation portable".to_string()),
                 },
             ),
+            (
+                PlatformKind::XBOX,
+                Platform {
+                    weight: 0,
+                    tags: vec!["microsoft".to_string()].into(),
+                    kind: PlatformKind::XBOX,
+                    regex: Some(r"^(?!.*360).*xbox.*$".to_string()),
+                },
+            ),
+            (
+                PlatformKind::X360,
+                Platform {
+                    weight: 0,
+                    tags: vec!["microsoft".to_string()].into(),
+                    kind: PlatformKind::X360,
+                    regex: Some(r"xbox 360".to_string()),
+                },
+            ),
         ])
     })
 }
@@ -254,7 +272,7 @@ impl Platform {
                         return None;
                     }
                 };
-                if re.is_match(input.to_lowercase().as_str()) {
+                if re.is_match(input.to_lowercase().as_str()).unwrap() {
                     return Some(platform.1);
                 }
             }
@@ -287,4 +305,6 @@ pub enum PlatformKind {
     N3DS,
     GC,
     PC,
+    XBOX,
+    X360,
 }
