@@ -83,7 +83,7 @@ impl Platform {
             }),
             PlatformKind::WII => Some(Platform {
                 weight: 95,
-                tags: vec!["nintendo".to_string(), "superduperteststring".to_string()"],
+                tags: vec!["nintendo".to_string(), "superduperteststring".to_string()],
                 kind: PlatformKind::WII,
             }),
             _ => None,
