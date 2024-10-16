@@ -14,13 +14,15 @@ fn create_client() -> Client {
 
 async fn execute_search(
     input: &str,
+    page: &usize,
     client: &Client,
 ) -> meilisearch_sdk::search::SearchResults<File> {
     client
         .index("files")
         .search()
         .with_sort(&["platform.weight:desc"])
-        .with_limit(40)
+        .with_hits_per_page(40)
+        .with_page(page.clone())
         .with_query(input)
         .execute::<File>()
         .await
@@ -30,6 +32,7 @@ async fn execute_search(
 
 fn app() -> Element {
     let mut input = use_signal(|| "".to_string());
+    let mut page = use_signal(|| 1);
     let client = create_client();
 
     let results = use_resource(move || {
@@ -38,7 +41,7 @@ fn app() -> Element {
             if &input() == "" {
                 return None;
             }
-            Some(execute_search(&input(), &client).await)
+            Some(execute_search(&input(), &page(), &client).await)
         }
     });
 
@@ -61,19 +64,19 @@ fn app() -> Element {
             div {
                 class: "container",
 
-            div { 
-                // style: "display: grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));", 
+            div {
+                // style: "display: grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));",
                 style: "display: flex;flex-wrap: wrap;padding-bottom:20px;padding-top:20px;",
-                div { 
-                    style: "", 
-                    h1 { style: "padding:0;padding-right: 5px", "Game rom search /" } 
-                } 
-                div { 
-                    // h1 { 
-                        style: "font-weight: 300;font-size: 0.8em;", 
+                div {
+                    style: "",
+                    h1 { style: "padding:0;padding-right: 5px", "Game rom search /" }
+                }
+                div {
+                    // h1 {
+                        style: "font-weight: 300;font-size: 0.8em;",
                         "Console filters are available, e.g. 'NES'."
                         // "add a console abbr to search by console, ex: street fighter nes"
-                    // } 
+                    // }
                 }
             }
             input {
@@ -82,6 +85,7 @@ fn app() -> Element {
                 name: "search",
                 placeholder: "Search a something...",
                 oninput: move |evt| {
+                  page.set(1);
                   input.set(evt.value());
                 }
             }
@@ -138,6 +142,32 @@ fn app() -> Element {
                                     {result.result.size.clone().unwrap_or("-".to_string()).replace(" ", "")}
                                     }
 
+                                }
+                            }
+
+                            if r.total_pages.unwrap_or(0) > 1 {
+
+
+                                tr {
+                                    td {
+                                        colspan: 3,
+                                        table {
+                                            style: "margin:0",
+                                            tr {
+                                        for n in 1..r.total_pages.unwrap_or(0) {
+                                            td{
+                                                style: "border:0",
+                                                a {
+                                                    onclick: move |evt| {
+                                                        page.set(n);
+                                                      },
+                                                    {n.to_string()}
+                                                }
+                                            }
+                                        }
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
