@@ -151,12 +151,12 @@ fn app() -> Element {
                                 tr {
                                     td {
                                         colspan: 3,
-                                        table {
-                                            style: "margin:0",
-                                            tr {
+                                        div {
+                                            style: "display: flex;flex-wrap: wrap;margin:0;",
+
                                         for n in 1..r.total_pages.unwrap_or(0) {
-                                            td{
-                                                style: "border:0",
+                                            div{
+                                                style: "border:0;padding:3px 0px 4px 4px",
                                                 a {
                                                     onclick: move |evt| {
                                                         page.set(n);
@@ -164,7 +164,7 @@ fn app() -> Element {
                                                     {n.to_string()}
                                                 }
                                             }
-                                        }
+                                        
                                             }
                                         }
                                     }
