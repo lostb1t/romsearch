@@ -74,7 +74,7 @@ fn app() -> Element {
                 div {
                     // h1 {
                         style: "font-weight: 300;font-size: 0.8em;",
-                        "Console filters are available, e.g. 'NES'."
+                        "Platform filters are available, e.g. 'NES'."
                         // "add a console abbr to search by console, ex: street fighter nes"
                     // }
                 }
@@ -83,7 +83,7 @@ fn app() -> Element {
                 r#type: "text",
                 id: "search",
                 name: "search",
-                placeholder: "Search a something...",
+                placeholder: "ex: 'street fighter' or 'street fighter snes'",
                 oninput: move |evt| {
                   page.set(1);
                   input.set(evt.value());

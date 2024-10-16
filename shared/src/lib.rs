@@ -81,6 +81,15 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                 },
             ),
             (
+                PlatformKind::WIIU,
+                Platform {
+                    weight: 0,
+                    tags: vec!["nintendo".to_string()].into(),
+                    kind: PlatformKind::WIIU,
+                    regex: Some(r"nintendo - wii u".to_string()),
+                },
+            ),
+            (
                 PlatformKind::N64,
                 Platform {
                     weight: 94,
@@ -99,11 +108,11 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                 },
             ),
             (
-                PlatformKind::DS3,
+                PlatformKind::N3DS,
                 Platform {
                     weight: 92,
                     tags: vec!["nintendo".to_string()].into(),
-                    kind: PlatformKind::DS3,
+                    kind: PlatformKind::N3DS,
                     regex: Some(r"nintendo 3ds | 3ds ".to_string()),
                 },
             ),
@@ -122,7 +131,7 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                     weight: 90,
                     tags: vec!["msdos".to_string(), "pc".to_string()].into(),
                     kind: PlatformKind::DOS,
-                    regex: Some(r" dos |ibm - pc and compatibles".to_string()),
+                    regex: Some(r" dos |ibm - pc compatible|ibm - pc and compatibles".to_string()),
                 },
             ),
             (
@@ -168,6 +177,42 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                     tags: vec![].into(),
                     kind: PlatformKind::ARCADE,
                     regex: Some(r"arcade".to_string()),
+                },
+            ),
+            (
+                PlatformKind::PS1,
+                Platform {
+                    weight: 0,
+                    tags: vec!["sony".to_string()].into(),
+                    kind: PlatformKind::PS1,
+                    regex: Some(r"\bplaystation\b(?!\s*\d)".to_string()),
+                },
+            ),
+            (
+                PlatformKind::PS2,
+                Platform {
+                    weight: 0,
+                    tags: vec!["sony".to_string()].into(),
+                    kind: PlatformKind::PS2,
+                    regex: Some(r"playstation 2".to_string()),
+                },
+            ),
+            (
+                PlatformKind::PS3,
+                Platform {
+                    weight: 0,
+                    tags: vec!["sony".to_string()].into(),
+                    kind: PlatformKind::PS3,
+                    regex: Some(r"playstation 3".to_string()),
+                },
+            ),
+            (
+                PlatformKind::PSP,
+                Platform {
+                    weight: 0,
+                    tags: vec!["sony".to_string()].into(),
+                    kind: PlatformKind::PSP,
+                    regex: Some(r"playstation portable".to_string()),
                 },
             ),
         ])
@@ -229,12 +274,17 @@ pub enum PlatformKind {
     GBA,
     GBC,
     NES,
+    PS1,
+    PS2,
+    PS3,
+    PSP,
     SNES,
     WII,
+    WIIU,
     N64,
     DS,
     #[strum(to_string = "3DS")]
-    DS3,
+    N3DS,
     GC,
     DOS,
 }
