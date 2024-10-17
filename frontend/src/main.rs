@@ -1,10 +1,13 @@
 #![allow(non_snake_case, unused)]
 use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
+use dioxus_sdk::utils::timing::{use_debounce, use_interval};
 use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
 use shared::File;
 use std::env;
+use std::time::Duration;
+use dioxus_lazy::{lazy, List};
 
 fn create_client() -> Client {
     let SEARCH_API_URL: &'static str = env!("SEARCH_API_URL");
@@ -35,12 +38,19 @@ fn app() -> Element {
     let mut page = use_signal(|| 1);
     let client = create_client();
 
+    // after testing i like the instant results. Leaving this here for future optimising if needed.
+    let mut debounce = use_debounce(Duration::from_millis(0), move |val| {
+        page.set(1);
+        input.set(val);
+     });
+
     let results = use_resource(move || {
         to_owned![client];
         async move {
             if &input() == "" {
                 return None;
             }
+            
             Some(execute_search(&input(), &page(), &client).await)
         }
     });
@@ -85,10 +95,17 @@ fn app() -> Element {
                 name: "search",
                 placeholder: "ex: 'street fighter' or 'street fighter snes'",
                 oninput: move |evt| {
-                  page.set(1);
-                  input.set(evt.value());
+                  debounce.action(evt.value());
                 }
             }
+            // search_input{}
+           // List {
+           // len: 100,
+           // size: 400.,
+          //  item_size: 20.,
+          //  make_item: move |idx: &usize| rsx! { "Async item {*idx}" },
+          //  make_value: lazy::from_async_fn(|idx| async move { idx })
+        //}
 
             div {
                 // style: "margin-top: 1em",
@@ -164,7 +181,7 @@ fn app() -> Element {
                                                     {n.to_string()}
                                                 }
                                             }
-                                        
+
                                             }
                                         }
                                     }
@@ -184,4 +201,29 @@ fn app() -> Element {
 fn main() {
     dioxus_logger::init(Level::INFO).expect("logger failed to init");
     dioxus::launch(app);
+}
+
+#[component]
+fn search_input() -> Element {
+    let mut count = use_signal(|| 0);
+
+    //use_interval(Duration::from_millis(100), move || {
+    //    count += 1;
+    //});
+
+    //let mut debounce = use_debounce(Duration::from_millis(2000), move |text| {
+    //    println!("{text}");
+    //    count.set(0);
+    //});
+
+    rsx! {
+        p { "{count}" }
+        button {
+            onclick: move |_| {
+                // Reset the counter after 2 seconds pass since the last click.
+                //debounce.action("button was clicked");
+            },
+            "Reset the counter! (2 second debounce)"
+        }
+    }
 }

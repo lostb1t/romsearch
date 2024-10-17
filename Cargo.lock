@@ -642,6 +642,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-lazy"
+version = "0.3.0-alpha.2"
+source = "git+https://github.com/dioxus-community/dioxus-lazy.git#466a1439b84342253c51f8c7b11f88e0a07d3c12"
+dependencies = [
+ "console_error_panic_hook",
+ "dioxus",
+ "dioxus-logger",
+ "dioxus-resize-observer",
+ "dioxus-use-mounted 0.3.0-alpha.3 (git+https://github.com/dioxus-community/dioxus-use-mounted)",
+ "futures",
+ "log",
+ "web-sys",
+]
+
+[[package]]
 name = "dioxus-lib"
 version = "0.6.0-alpha.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -666,6 +681,18 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-wasm",
+]
+
+[[package]]
+name = "dioxus-resize-observer"
+version = "0.3.0-alpha.3"
+source = "git+https://github.com/dioxus-community/dioxus-resize-observer#6a67fdcce5764761df339cc9e89d98cba749094f"
+dependencies = [
+ "dioxus",
+ "dioxus-use-mounted 0.3.0-alpha.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "js-sys",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
@@ -718,6 +745,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-sdk"
+version = "0.6.0"
+source = "git+https://github.com/DioxusLabs/sdk.git?branch=feat/dioxus-0.6#d1bbc35ed1cd589f353e99b6dd0dfff56b75f246"
+dependencies = [
+ "cfg-if",
+ "dioxus",
+ "futures",
+ "gloo-timers 0.3.0",
+ "js-sys",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "dioxus-signals"
 version = "0.6.0-alpha.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -745,6 +787,23 @@ dependencies = [
  "dioxus-router",
  "dioxus-web",
  "tracing",
+]
+
+[[package]]
+name = "dioxus-use-mounted"
+version = "0.3.0-alpha.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2483b57b229cc108f28ff56a57698e59a05b703944c0bc5776c5a94f0a11598e"
+dependencies = [
+ "dioxus",
+]
+
+[[package]]
+name = "dioxus-use-mounted"
+version = "0.3.0-alpha.3"
+source = "git+https://github.com/dioxus-community/dioxus-use-mounted#ffa65a8168b343beb7baf4451746d396c5b14dee"
+dependencies = [
+ "dioxus",
 ]
 
 [[package]]
@@ -931,7 +990,9 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "dioxus",
+ "dioxus-lazy",
  "dioxus-logger",
+ "dioxus-sdk",
  "meilisearch-sdk",
  "reqwest",
  "serde",
@@ -1123,7 +1184,7 @@ dependencies = [
  "gloo-net 0.3.1",
  "gloo-render",
  "gloo-storage",
- "gloo-timers",
+ "gloo-timers 0.2.6",
  "gloo-utils 0.1.7",
  "gloo-worker",
 ]
@@ -1262,6 +1323,18 @@ version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b995a66bb87bebce9a0f4a95aed01daca4872c050bfcb21653361c03bc35e5c"
 dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "gloo-timers"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbb143cf96099802033e0d4f4963b19fd2e0b728bcf076cd9cf7f6634f092994"
+dependencies = [
+ "futures-channel",
+ "futures-core",
  "js-sys",
  "wasm-bindgen",
 ]

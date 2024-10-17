@@ -233,6 +233,24 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                     regex: Some(r"xbox 360".to_string()),
                 },
             ),
+            (
+                PlatformKind::GEN,
+                Platform {
+                    weight: 0,
+                    tags: vec!["sega".to_string(), "mega drive".to_string(), "genesis".to_string()].into(),
+                    kind: PlatformKind::GEN,
+                    regex: Some(r"genesis".to_string()),
+                },
+            ),
+            (
+                PlatformKind::SMS,
+                Platform {
+                    weight: 0,
+                    tags: vec!["sega".to_string(), "master system".to_string()].into(),
+                    kind: PlatformKind::SMS,
+                    regex: Some(r"master systen".to_string()),
+                },
+            ),
         ])
     })
 }
@@ -307,4 +325,6 @@ pub enum PlatformKind {
     PC,
     XBOX,
     X360,
+    GEN,
+    SMS
 }

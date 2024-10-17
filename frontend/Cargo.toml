@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-#openssl = { version = "0.10", features = ["vendored"] }
 dioxus = { version = "0.6.0-alpha.2", features = ["web"]}
 serde = "1.0.159"
 simple_logger = "4.2.0"
@@ -16,16 +15,12 @@ reqwest = "0.12.8"
 meilisearch-sdk = { version = "0.27.1", features = ["futures-unsend"] }
 anyhow = "1.0.89"
 dioxus-logger = "0.5.1"
-shared = { path = "../shared" }
-# scraper = { version =  "0.20.0", optional = true}
+dioxus-sdk = { git = "https://github.com/DioxusLabs/sdk.git", branch = "feat/dioxus-0.6", features = ["timing"] }
+dioxus-lazy = { git = "https://github.com/dioxus-community/dioxus-lazy.git" }
 
-# [[bin]]
-# name = "sync"
-# required-features = ["backend"]
-# path = "src/bin/sync.rs"
+shared = { path = "../shared" }
+
 
 [features]
-# backend = ["dep:tokio", "dep:tokio", "dep:scraper"]
 default = []
-# server = ["dioxus/axum"]
 web = ["dioxus/web"]
