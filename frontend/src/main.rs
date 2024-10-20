@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 use shared::File;
 use std::env;
 use std::time::Duration;
-use dioxus_lazy::{lazy, List};
+use async_std::task::sleep;
+use std::rc::Rc;
+//use dioxus_lazy::{lazy, List};
 
 fn create_client() -> Client {
     let SEARCH_API_URL: &'static str = env!("SEARCH_API_URL");
@@ -36,6 +38,7 @@ async fn execute_search(
 fn app() -> Element {
     let mut input = use_signal(|| "".to_string());
     let mut page = use_signal(|| 1);
+    //let mut footer = use_signal(|| None as Option<Rc<MountedData>>);
     let client = create_client();
 
     // after testing i like the instant results. Leaving this here for future optimising if needed.
@@ -54,7 +57,7 @@ fn app() -> Element {
             Some(execute_search(&input(), &page(), &client).await)
         }
     });
-
+   
     rsx! {
             // head::Link {
             //     rel: "stylesheet",
@@ -82,18 +85,15 @@ fn app() -> Element {
                     h1 { style: "padding:0;padding-right: 5px", "Game rom search /" }
                 }
                 div {
-                    // h1 {
                         style: "font-weight: 300;font-size: 0.8em;",
-                        "Platform filters are available, e.g. 'NES'."
-                        // "add a console abbr to search by console, ex: street fighter nes"
-                    // }
+                        "Negative filters are available, e.g. '-nes'"
                 }
             }
             input {
                 r#type: "text",
                 id: "search",
                 name: "search",
-                placeholder: "ex: 'street fighter' or 'street fighter snes'",
+                placeholder: "'street fighter snes' or 'street fighter -alpha -gba'",
                 oninput: move |evt| {
                   debounce.action(evt.value());
                 }
@@ -115,6 +115,7 @@ fn app() -> Element {
                     table {
                         //style: "overflow-x:auto;",
                         tfoot {
+                            //onmounted: move |element| footer.set(Some(element.data())),
                             tr {
                                 th {
                                     colspan: 3,
@@ -131,6 +132,13 @@ fn app() -> Element {
                             th { "platform" }
                             th { "size" }
                         }
+                        //if let i = input.read() {
+                        //  if i.is_empty() {
+                        //    tr {
+                        //      td {  colspan: 3, "how does it work: Search"}
+                        //    }
+                        //  }
+                        //}
                         if let Some(Some(r)) = results.read().as_ref() {
                         if r.hits.is_empty() {
                             tr {
