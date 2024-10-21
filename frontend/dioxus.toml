@@ -11,7 +11,7 @@ default_platform = "web"
 out_dir = "../docs"
 
 # assets file folder
-# asset_dir = "assets"
+asset_dir = "assets"
 
 [web.app]
 
@@ -45,4 +45,4 @@ script = []
 
 [bundle]
 # The list of files to include in the bundle. These can contain globs.
-resources = ["./assets/*.css"]
+resources = ["./assets/*.*"]

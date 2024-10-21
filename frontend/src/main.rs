@@ -79,16 +79,26 @@ fn app() -> Element {
 
             div {
                 // style: "display: grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));",
-                style: "display: flex;flex-wrap: wrap;padding-bottom:20px;padding-top:20px;",
+                //style: "display: flex;flex-wrap: wrap;padding-bottom:20px;padding-top:20px;",
+                style: "display: flex;padding-top:20px;",
                 div {
                     style: "",
-                    h1 { style: "padding:0;padding-right: 5px", "Game rom search /" }
+                    h1 { style: "padding:0;padding-right: 5px", "Game rom search "
+
                 }
-                div {
-                        style: "font-weight: 300;font-size: 0.8em;",
+
+                  }
+                  div {
+                    style: "width:15px;margin-left: auto;",
+                      a {href: "https://github.com/lostb1t/romsearch", target: "_blank", img { style: "height:15px;width:15px;", src: "https://p.kindpng.com/picc/s/726-7262336_deadpool-logo-pixel-art-hd-png-download.png"}}
+                  }
+
+
+            }
+                            div {
+                        style: "padding-bottom:20px;font-weight: 300;font-size: 0.8em;",
                         "Negative filters are available, e.g. '-nes'"
                 }
-            }
             input {
                 r#type: "text",
                 id: "search",

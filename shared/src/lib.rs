@@ -120,7 +120,7 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                 PlatformKind::GC,
                 Platform {
                     weight: 91,
-                    tags: vec!["nintendo".to_string(), "gamecube".to_string()].into(),
+                    tags: vec!["nintendo".to_string(), "gamecube".to_string(), "ngc".to_string(), "gcn".to_string()].into(),
                     kind: PlatformKind::GC,
                     regex: Some(r"nintendo gamecube".to_string()),
                 },
