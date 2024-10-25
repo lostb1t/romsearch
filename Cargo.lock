@@ -1119,6 +1119,8 @@ dependencies = [
  "reqwest",
  "serde",
  "shared",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

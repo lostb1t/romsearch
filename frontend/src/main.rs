@@ -1,4 +1,5 @@
 #![allow(non_snake_case, unused)]
+use async_std::task::sleep;
 use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
 use dioxus_sdk::utils::timing::{use_debounce, use_interval};
@@ -6,9 +7,11 @@ use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
 use shared::File;
 use std::env;
-use std::time::Duration;
-use async_std::task::sleep;
 use std::rc::Rc;
+use std::time::Duration;
+use web_sys;
+use dioxus::web::WebEventExt;
+use wasm_bindgen::{closure::Closure, JsCast, JsValue};
 //use dioxus_lazy::{lazy, List};
 
 fn create_client() -> Client {
@@ -38,14 +41,15 @@ async fn execute_search(
 fn app() -> Element {
     let mut input = use_signal(|| "".to_string());
     let mut page = use_signal(|| 1);
-    //let mut footer = use_signal(|| None as Option<Rc<MountedData>>);
+    //let mut footer: Signal<Option<Rc<MountedData>>> =
+        use_signal(|| None as Option<Rc<MountedData>>);
     let client = create_client();
 
     // after testing i like the instant results. Leaving this here for future optimising if needed.
     let mut debounce = use_debounce(Duration::from_millis(0), move |val| {
         page.set(1);
         input.set(val);
-     });
+    });
 
     let results = use_resource(move || {
         to_owned![client];
@@ -53,27 +57,17 @@ fn app() -> Element {
             if &input() == "" {
                 return None;
             }
-            
+
             Some(execute_search(&input(), &page(), &client).await)
         }
     });
-   
+
     rsx! {
-            // head::Link {
-            //     rel: "stylesheet",
-            //     href: "https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css"
-            // }
-            // head::Link {
-            //     rel: "stylesheet",
-            //     href: asset!("./assets/site.css")
-            // }
-            // head::Style {
-            //  r#"
-            //      table td, table th {{
-            //          border: 0;
-            //      }}
-            //  "#
-            // }
+            // document::Link {
+             //    rel: "stylesheet",
+             //    href: asset!("site.css")
+             //}
+
             div {
                 class: "container",
 
@@ -83,7 +77,7 @@ fn app() -> Element {
                 style: "display: flex;padding-top:20px;",
                 div {
                     style: "",
-                    h1 { style: "padding:0;padding-right: 5px", "Game rom search "
+                    h1 { style: "padding:0;padding-right: 5px", "Myrient rom search "
 
                 }
 

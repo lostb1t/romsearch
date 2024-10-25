@@ -1,7 +1,7 @@
 [application]
 
 # App (Project) Name
-name = "Rom search"
+name = "Myrient search"
 
 # Dioxus App Default Platform
 # web, desktop, fullstack
@@ -17,7 +17,7 @@ asset_dir = "assets"
 
 # HTML title tag content
 title = "Rom Search"
-base_path = "romsearch"
+#base_path = "romsearch"
 
 [web.watcher]
 

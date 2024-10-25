@@ -251,6 +251,15 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
                     regex: Some(r"master system".to_string()),
                 },
             ),
+            (
+                PlatformKind::MAME,
+                Platform {
+                    weight: 0,
+                    tags: vec!["mame".to_string()].into(),
+                    kind: PlatformKind::MAME,
+                    regex: Some(r"mame".to_string()),
+                },
+            ),
         ])
     })
 }
@@ -327,5 +336,6 @@ pub enum PlatformKind {
     #[strum(to_string = "360")]
     X360,
     GEN,
-    SMS
+    SMS,
+    MAME
 }

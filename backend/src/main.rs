@@ -29,7 +29,6 @@ impl RetryableStrategy for Retry {
             Err(error) => {
                 // get a channelClosed error sometimes. Just force that shit.
                 if error.status().is_none() {
-                    dbg!("RETRY");
                     return Some(Retryable::Transient);
                 };
                 default_on_request_failure(error)
@@ -88,13 +87,16 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
             let name = href;
             let location = format!("{}/{}", url.clone(), name);
             let decoded_location = decode(&location).unwrap().to_string();
-            let platform = shared::Platform::parse(&decoded_location);
-            // dbg!(&platform);
-            //if platform.is_some() {
-            //    dbg!(&platform.unwrap().kind);
-            //     process::exit(0);
+            //let platform = shared::Platform::parse(&decoded_location);
+            let platform = match shared::Platform::parse(&decoded_location) {
+                Some(p) => {
+                    let mut k = p.clone();
+                    k.regex = None;
+                    Some(k)
+                },
+                None => None
+            };
 
-            //}
             location.hash(&mut s);
             files.push(File {
                 id: s.finish(),
@@ -102,7 +104,7 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
                 location,
                 size: Some(size.to_string()),
                 date: Some(date.to_string()),
-                platform: platform.cloned(),
+                platform
             })
         }
     }
