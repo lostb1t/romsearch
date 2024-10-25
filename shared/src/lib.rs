@@ -8,6 +8,15 @@ fn platforms() -> &'static HashMap<PlatformKind, Platform> {
     static HASHMAP: OnceLock<HashMap<PlatformKind, Platform>> = OnceLock::new();
     HASHMAP.get_or_init(|| {
         HashMap::from([
+           (
+                PlatformKind::AUDIO,
+                Platform {
+                    weight: 0,
+                    tags: vec![].into(),
+                    kind: PlatformKind::AUDIO,
+                    regex: Some(r"audio cd".to_string()),
+                },
+            ),
             (
                 PlatformKind::GB,
                 Platform {
@@ -310,6 +319,7 @@ impl Platform {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Display, Clone, Hash)]
 pub enum PlatformKind {
+    AUDIO,
     AMIGA,
     ARCADE,
     A26,
