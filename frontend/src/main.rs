@@ -9,9 +9,9 @@ use shared::File;
 use std::env;
 use std::rc::Rc;
 use std::time::Duration;
-use web_sys;
+//use web_sys;
 use dioxus::web::WebEventExt;
-use wasm_bindgen::{closure::Closure, JsCast, JsValue};
+//use wasm_bindgen::{closure::Closure, JsCast, JsValue};
 //use dioxus_lazy::{lazy, List};
 
 fn create_client() -> Client {

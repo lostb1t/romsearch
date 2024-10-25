@@ -17,7 +17,7 @@ asset_dir = "assets"
 
 # HTML title tag content
 title = "Rom Search"
-#base_path = "romsearch"
+base_path = "romsearch"
 
 [web.watcher]
 
