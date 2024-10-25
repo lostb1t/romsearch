@@ -41,8 +41,6 @@ async fn execute_search(
 fn app() -> Element {
     let mut input = use_signal(|| "".to_string());
     let mut page = use_signal(|| 1);
-    //let mut footer: Signal<Option<Rc<MountedData>>> =
-        use_signal(|| None as Option<Rc<MountedData>>);
     let client = create_client();
 
     // after testing i like the instant results. Leaving this here for future optimising if needed.
@@ -213,29 +211,4 @@ fn app() -> Element {
 fn main() {
     dioxus_logger::init(Level::INFO).expect("logger failed to init");
     dioxus::launch(app);
-}
-
-#[component]
-fn search_input() -> Element {
-    let mut count = use_signal(|| 0);
-
-    //use_interval(Duration::from_millis(100), move || {
-    //    count += 1;
-    //});
-
-    //let mut debounce = use_debounce(Duration::from_millis(2000), move |text| {
-    //    println!("{text}");
-    //    count.set(0);
-    //});
-
-    rsx! {
-        p { "{count}" }
-        button {
-            onclick: move |_| {
-                // Reset the counter after 2 seconds pass since the last click.
-                //debounce.action("button was clicked");
-            },
-            "Reset the counter! (2 second debounce)"
-        }
-    }
 }
