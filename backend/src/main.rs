@@ -51,8 +51,6 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
         ))
         .build();
 
-    //let text = client.get(&url).send().await?.text().await?;
-
     let text = match client.get(&url).send().await {
         Ok(res) => res.text().await?,
         Err(e) => {
@@ -87,7 +85,7 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
             let name = href;
             let location = format!("{}/{}", url.clone(), name);
             let decoded_location = decode(&location).unwrap().to_string();
-            //let platform = shared::Platform::parse(&decoded_location);
+
             let platform = match shared::Platform::parse(&decoded_location) {
                 Some(p) => {
                     let mut k = p.clone();
@@ -111,23 +109,15 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
     drop(fragment);
 
     if !files.is_empty() {
-        //dbg!("Commiting files");
-        //dbg!(files.len());
         let _ = search_client
             .index("files")
             .add_or_update(&files, Some("id"))
             .await;
-        // .unwrap()
-        // //.wait_for_completion(&search_client, None, None)
-        // .await
-        // .unwrap();
     }
 
     drop(files);
 
     if !futures.is_empty() {
-        //dbg!("Awaiting futures");
-        //dbg!(futures.len());
         let mut stream = futures::stream::iter(futures).buffer_unordered(25);
 
         while let Some(response) = stream.next().await {
@@ -136,9 +126,6 @@ async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Er
     }
 
     Ok(())
-    // files.append(&mut stream);
-
-    // Ok(files)
 }
 
 async fn sync() -> Result<(), anyhow::Error> {
@@ -148,7 +135,6 @@ async fn sync() -> Result<(), anyhow::Error> {
     let searchable_attributes = ["platform.kind", "platform.tags", "name", "location"];
     let sortable_attributes = ["platform.weight"];
     let displayed_attributes = ["id", "platform.kind", "platform.weight", "name", "location", "size", "date"];
-    //let platforms = Platform::platforms();
     let _ = search_client
         .index("files")
         .set_searchable_attributes(&searchable_attributes)
