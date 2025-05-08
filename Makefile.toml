@@ -26,11 +26,10 @@ command = "dx"
 args = ["build", "--features", "web", "--release"]
 
 [tasks.move-dist]
-cwd = "frontend"
+#cwd = "frontend"
 workspace = false
-command = "mv"
-args = ["dist", "../docs"]
-
+command = "cp"
+args = ["./target/dx/frontend/release/web/public/*", "./docs"]
 
 [tasks.run-sync]
 command = "cargo"

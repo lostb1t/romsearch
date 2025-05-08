@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport"
         content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-    
+    <link rel="preload" as="script" href="/romsearch/assets/frontend-c28afbbe525f6d03.js" crossorigin><link rel="preload" as="fetch" type="application/wasm" href="/romsearch/assets/frontend_bg-2d2ecce626ada995.wasm" crossorigin>
 
     <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css" />
     <style>
@@ -32,50 +32,14 @@
   <div id="main">
     </div>
     <script type="module">
-        import init from "/romsearch/assets/dioxus/Myrient search.js";
-        init("/romsearch/assets/dioxus/Myrient search_bg.wasm").then(wasm => {
+        import init from "/romsearch/assets/dioxus/frontend.js";
+        init("/romsearch/assets/dioxus/frontend_bg.wasm").then(wasm => {
             if (wasm.__wbindgen_start == undefined) {
                 wasm.main();
             }
         });
     </script>
-    
+    {script_include}
 </body>
 
-</html><script>// Dioxus-CLI
-// https://github.com/DioxusLabs/dioxus/tree/master/packages/cli
-// NOTE: This is also used in the fullstack package at ../packages/fullstack/src/render.rs, if you make changes here, make sure to update the version in there as well
-// TODO: Extract hot reloading with axum into a separate crate or use the fullstack hot reloading Axum extension trait here
-
-(function () {
-  var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  var url = protocol + "//" + window.location.host + "/_dioxus/ws";
-  var poll_interval = 8080;
-
-  var reload_upon_connect = (event) => {
-    // Firefox will send a 1001 code when the connection is closed because the page is reloaded
-    // Only firefox will trigger the onclose event when the page is reloaded manually: https://stackoverflow.com/questions/10965720/should-websocket-onclose-be-triggered-by-user-navigation-or-refresh
-    // We should not reload the page in this case
-    if (event.code === 1001) {
-      return;
-    }
-    window.setTimeout(() => {
-      var ws = new WebSocket(url);
-      ws.onopen = () => window.location.reload();
-      ws.onclose = reload_upon_connect;
-    }, poll_interval);
-  };
-
-  var ws = new WebSocket(url);
-
-  ws.onmessage = (ev) => {
-    console.log("Received message: ", ev, ev.data);
-
-    if (ev.data == "reload") {
-      window.location.reload();
-    }
-  };
-
-  ws.onclose = reload_upon_connect;
-})();
-</script>
+</html>
