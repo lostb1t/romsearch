@@ -27,6 +27,7 @@ impl RetryableStrategy for Retry {
         match res {
             Ok(success) => None,
             Err(error) => {
+                println!("status: {:#?}", &error.status());
                 // get a channelClosed error sometimes. Just force that shit.
                 if error.status().is_none() {
                     return Some(Retryable::Transient);
@@ -38,11 +39,9 @@ impl RetryableStrategy for Retry {
 }
 
 async fn parse_page(url: String, search_client: Client) -> Result<(), anyhow::Error> {
-    // dbg!("Processing: ");
-    // dbg!(&url);
     let mut files: Vec<File> = vec![];
 
-    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(3);
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(10);
     let client = ClientBuilder::new(reqwest::Client::new())
         //.with(RetryTransientMiddleware::new_with_policy(retry_policy))
         .with(RetryTransientMiddleware::new_with_policy_and_strategy(
