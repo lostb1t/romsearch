@@ -38,6 +38,9 @@ async fn execute_search(
     //.hits
 }
 
+const SITE_CSS: Asset = asset!("/assets/site.css");
+   
+
 fn app() -> Element {
     let mut input = use_signal(|| "".to_string());
     let mut page = use_signal(|| 1);
@@ -61,6 +64,9 @@ fn app() -> Element {
     });
 
     rsx! {
+                document::Link { rel: "stylesheet", href: "https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css" }
+          document::Link { rel: "stylesheet", href: SITE_CSS }
+
             // document::Link {
              //    rel: "stylesheet",
              //    href: asset!("site.css")
