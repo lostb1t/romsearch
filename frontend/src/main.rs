@@ -2,7 +2,7 @@
 use async_std::task::sleep;
 use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
-use dioxus_sdk::utils::timing::{use_debounce, use_interval};
+use dioxus_sdk::time::{use_debounce, use_interval};
 use meilisearch_sdk::client::*;
 use serde::{Deserialize, Serialize};
 use shared::File;

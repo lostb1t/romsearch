@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { version = "0.6.3", features = ["web"]}
+dioxus = { version = "0.7.2", features = ["web"]}
 serde = "1.0.159"
 reqwest = "0.12.8"
 meilisearch-sdk = { version = "0.27.1", features = ["futures-unsend"] }
 anyhow = "1.0.89"
-dioxus-logger = "0.5.1"
-dioxus-sdk = { git = "https://github.com/DioxusLabs/sdk.git", branch = "feat/dioxus-0.6", features = ["timing"] }
+dioxus-logger = "0.7"
+dioxus-sdk = {  version = "0.7.0", features = ["time"] }
 #dioxus-lazy = { git = "https://github.com/dioxus-community/dioxus-lazy.git" }
 
 shared = { path = "../shared" }
