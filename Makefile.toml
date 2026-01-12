@@ -5,7 +5,7 @@ default_to_workspace = false
 cwd = "frontend"
 workspace = false
 command = "dx"
-args = ["serve", "--platform", "web", "--hot-reload"]
+args = ["serve", "--platform", "web", "--addr", "0.0.0.0", "--port", "8888"]
 
 [tasks.watch-tailwind]
 command = "npx"
