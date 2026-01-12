@@ -64,7 +64,7 @@ fn app() -> Element {
     });
 
     rsx! {
-                document::Link { rel: "stylesheet", href: "https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css" }
+          document::Link { rel: "stylesheet", href: "https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css" }
           document::Link { rel: "stylesheet", href: SITE_CSS }
 
             // document::Link {
